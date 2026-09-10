@@ -1,1 +1,1 @@
-export * from './aws-s3.storage'
+export * from './aws-s3.storage.js'

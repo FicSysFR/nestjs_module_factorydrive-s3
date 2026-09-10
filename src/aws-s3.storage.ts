@@ -1,35 +1,36 @@
+import { GetObjectCommand, S3, type S3ClientConfig } from '@aws-sdk/client-s3'
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
 import {
   AbstractStorage,
-  ContentResponse,
-  DeleteResponse,
-  ExistsResponse,
-  FileListResponse,
+  type ContentResponse,
+  type DeleteResponse,
+  type ExistsResponse,
+  type FileListResponse,
   FileNotFoundException,
   NoSuchBucketException,
   PermissionMissingException,
-  Response,
-  SignedUrlOptions,
-  SignedUrlResponse,
-  StatResponse,
+  type Response,
+  type SignedUrlOptions,
+  type SignedUrlResponse,
+  type StatResponse,
   UnknownException,
-} from '@tacxou/nestjs_module_factorydrive'
-import { GetObjectCommand, S3, S3ClientConfig } from '@aws-sdk/client-s3'
-import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
+} from '@ficsysfr/nestjs_module_factorydrive'
 
 export interface AmazonWebServicesS3StorageConfig extends S3ClientConfig {
   bucket: string
 }
 
-function handleError(err: Error, path: string, bucket: string): Error {
-  switch (err.name) {
+function handleError(err: unknown, path: string, bucket: string): Error {
+  const error = err instanceof Error ? err : new Error(String(err))
+  switch (error.name) {
     case 'NoSuchBucket':
-      return new NoSuchBucketException(err, bucket)
+      return new NoSuchBucketException(error, bucket)
     case 'NoSuchKey':
-      return new FileNotFoundException(err, path)
+      return new FileNotFoundException(error, path)
     case 'AllAccessDisabled':
-      return new PermissionMissingException(err, path)
+      return new PermissionMissingException(error, path)
     default:
-      return new UnknownException(err, err.name, path)
+      return new UnknownException(error, error.name, path)
   }
 }
 
@@ -42,14 +43,7 @@ function isNotFound(err: unknown): boolean {
     $metadata?: { httpStatusCode?: number }
     statusCode?: number
   }
-  return (
-    e.name === 'NotFound' ||
-    e.name === 'NoSuchKey' ||
-    e.Code === 'NotFound' ||
-    e.Code === 'NoSuchKey' ||
-    e.$metadata?.httpStatusCode === 404 ||
-    e.statusCode === 404
-  )
+  return e.name === 'NotFound' || e.name === 'NoSuchKey' || e.Code === 'NotFound' || e.Code === 'NoSuchKey' || e.$metadata?.httpStatusCode === 404 || e.statusCode === 404
 }
 
 // noinspection JSUnusedGlobalSymbols
@@ -114,6 +108,7 @@ export class AwsS3Storage extends AbstractStorage {
   public async getBuffer(location: string): Promise<ContentResponse<Buffer>> {
     try {
       const result = await this.$driver.getObject({ Key: location, Bucket: this.$bucket })
+      if (!result.Body) throw new Error(`S3 returned no body for ${location}`)
       const body = await result.Body.transformToByteArray()
       return { content: Buffer.from(body), raw: result }
     } catch (e) {
@@ -121,7 +116,7 @@ export class AwsS3Storage extends AbstractStorage {
     }
   }
 
-  public async getSignedUrl(location: string, options: SignedUrlOptions & any = {}): Promise<SignedUrlResponse> {
+  public async getSignedUrl(location: string, options: SignedUrlOptions & NonNullable<Parameters<typeof getSignedUrl>[2]> = {}): Promise<SignedUrlResponse> {
     const { expiresIn = 900 } = options
     try {
       const params = {
@@ -195,7 +190,7 @@ export class AwsS3Storage extends AbstractStorage {
 
         continuationToken = response.NextContinuationToken
 
-        for (const file of response.Contents) {
+        for (const file of response.Contents ?? []) {
           yield {
             raw: file,
             path: file.Key as string,

@@ -9,16 +9,16 @@
 </p>
 
 <p align="center">
-  <a href="https://www.npmjs.com/org/tacxou"><img src="https://img.shields.io/npm/v/@tacxou/nestjs_module_factorydrive-s3.svg" alt="NPM Version" /></a>
-  <a href="https://www.npmjs.com/org/tacxou"><img src="https://img.shields.io/npm/l/@tacxou/nestjs_module_factorydrive-s3.svg" alt="Package License" /></a>
-  <a href="https://github.com/tacxou/nestjs_module_factorydrive-s3/actions/workflows/ci.yml"><img src="https://github.com/tacxou/nestjs_module_factorydrive-s3/actions/workflows/ci.yml/badge.svg" alt="Publish Package to npmjs" /></a>
-  <a href="https://codecov.io/gh/tacxou/nestjs_module_factorydrive"><img src="https://codecov.io/gh/tacxou/nestjs_module_factorydrive/graph/badge.svg?token=KK6LY0DZ4p"/></a>
-  <a href="https://github.com/tacxou/nestjs_module_factorydrive-s3/actions/workflows/release.yml?event=workflow_dispatch"><img alt="GitHub contributors" src="https://github.com/tacxou/nestjs_module_factorydrive-s3/actions/workflows/release.yml/badge.svg"></a>
+  <a href="https://www.npmjs.com/org/ficsysfr"><img src="https://img.shields.io/npm/v/@ficsysfr/nestjs_module_factorydrive-s3.svg" alt="NPM Version" /></a>
+  <a href="https://www.npmjs.com/org/ficsysfr"><img src="https://img.shields.io/npm/l/@ficsysfr/nestjs_module_factorydrive-s3.svg" alt="Package License" /></a>
+  <a href="https://github.com/FicSysFR/nestjs_module_factorydrive-s3/actions/workflows/ci.yml"><img src="https://github.com/FicSysFR/nestjs_module_factorydrive-s3/actions/workflows/ci.yml/badge.svg" alt="CI" /></a>
+  <a href="https://codecov.io/gh/FicSysFR/nestjs_module_factorydrive-s3"><img src="https://codecov.io/gh/FicSysFR/nestjs_module_factorydrive-s3/graph/badge.svg" alt="Coverage" /></a>
+  <a href="https://github.com/FicSysFR/nestjs_module_factorydrive-s3/actions/workflows/release.yml?event=workflow_dispatch"><img alt="Release" src="https://github.com/FicSysFR/nestjs_module_factorydrive-s3/actions/workflows/release.yml/badge.svg"></a>
 </p>
 <br>
 
 # S3 driver for Factory drive module
-S3 storage driver for [`@tacxou/nestjs_module_factorydrive`](https://www.npmjs.com/package/@tacxou/nestjs_module_factorydrive), built for NestJS.
+S3 storage driver for [`@ficsysfr/nestjs_module_factorydrive`](https://www.npmjs.com/package/@ficsysfr/nestjs_module_factorydrive), built for NestJS.
 
 ## Features
 - Amazon S3-compatible implementation of `AbstractStorage`
@@ -37,19 +37,19 @@ S3 storage driver for [`@tacxou/nestjs_module_factorydrive`](https://www.npmjs.c
 Install the Factory Drive core module and this S3 driver:
 
 ```bash
-npm install @tacxou/nestjs_module_factorydrive @tacxou/nestjs_module_factorydrive-s3
+npm install @ficsysfr/nestjs_module_factorydrive @ficsysfr/nestjs_module_factorydrive-s3
 ```
 
 ```bash
-yarn add @tacxou/nestjs_module_factorydrive @tacxou/nestjs_module_factorydrive-s3
+yarn add @ficsysfr/nestjs_module_factorydrive @ficsysfr/nestjs_module_factorydrive-s3
 ```
 
 ```bash
-pnpm add @tacxou/nestjs_module_factorydrive @tacxou/nestjs_module_factorydrive-s3
+pnpm add @ficsysfr/nestjs_module_factorydrive @ficsysfr/nestjs_module_factorydrive-s3
 ```
 
 ```bash
-bun add @tacxou/nestjs_module_factorydrive @tacxou/nestjs_module_factorydrive-s3
+bun add @ficsysfr/nestjs_module_factorydrive @ficsysfr/nestjs_module_factorydrive-s3
 ```
 
 ## Quick start (NestJS)
@@ -57,8 +57,8 @@ Register the driver class in your app startup:
 
 ```ts
 import { Module } from '@nestjs/common'
-import { FactorydriveService } from '@tacxou/nestjs_module_factorydrive'
-import { AwsS3Storage } from '@tacxou/nestjs_module_factorydrive-s3'
+import { FactorydriveService } from '@ficsysfr/nestjs_module_factorydrive'
+import { AwsS3Storage } from '@ficsysfr/nestjs_module_factorydrive-s3'
 
 @Module({
   // ...
@@ -78,7 +78,7 @@ The constructor accepts `AmazonWebServicesS3StorageConfig`, which extends AWS `S
 Example:
 
 ```ts
-import { AwsS3Storage } from '@tacxou/nestjs_module_factorydrive-s3'
+import { AwsS3Storage } from '@ficsysfr/nestjs_module_factorydrive-s3'
 
 const storage = new AwsS3Storage({
   bucket: 'my-app-bucket',
@@ -156,14 +156,19 @@ console.log(signed.signedUrl)
 ## Development
 Useful scripts:
 
-- `bun test`: run tests
-- `bun test --coverage --coverage-reporter lcov`: run coverage
-- `bun run build`: build package
+- `yarn lint`: run Biome checks
+- `yarn typecheck`: typecheck without emitting files
+- `yarn test`: run Vitest tests
+- `yarn test:coverage`: run tests with enforced coverage thresholds
+- `yarn build`: build the package
+- `yarn package` / `make package`: create and audit the npm tarball under `.artifacts/npm/`
+- `make check`: run every local quality gate
+- `make release VERSION=2.0.0 CHANNEL=latest WATCH=1`: dispatch and optionally watch the manual release
 
 CI runs tests (with coverage upload) and build on pushes/PRs.
 
 ## Compatibility
-- Peer dependency: `@tacxou/nestjs_module_factorydrive@^1.0.0`
+- Peer dependency: `@ficsysfr/nestjs_module_factorydrive@^2.0.0`
 - TypeScript peer dependency: `^5.0.0`
 
 ## Security

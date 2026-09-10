@@ -5,7 +5,7 @@
 
 version: 2
 updates:
-  - package-ecosystem: "bun" # See documentation for possible values
+  - package-ecosystem: "npm" # Covers package.json and yarn.lock
     directory: "/" # Location of package manifests
     schedule:
       interval: "weekly"

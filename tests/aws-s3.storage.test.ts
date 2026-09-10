@@ -1,11 +1,6 @@
-import { beforeEach, describe, expect, it, mock } from 'bun:test'
-import {
-  FileNotFoundException,
-  NoSuchBucketException,
-  PermissionMissingException,
-  UnknownException,
-} from '@tacxou/nestjs_module_factorydrive'
-import { AwsS3Storage } from '../src/aws-s3.storage'
+import { FileNotFoundException, NoSuchBucketException, PermissionMissingException, UnknownException } from '@ficsysfr/nestjs_module_factorydrive'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { AwsS3Storage } from '../src/aws-s3.storage.js'
 
 type ErrorWithStatus = Error & {
   statusCode?: number
@@ -13,10 +8,7 @@ type ErrorWithStatus = Error & {
   $metadata?: { httpStatusCode?: number }
 }
 
-function makeError(
-  name: string,
-  options?: { statusCode?: number; Code?: string; httpStatusCode?: number },
-): ErrorWithStatus {
+function makeError(name: string, options?: { statusCode?: number; Code?: string; httpStatusCode?: number }): ErrorWithStatus {
   const error = new Error(name) as ErrorWithStatus
   error.name = name
   if (options?.statusCode !== undefined) {
@@ -42,16 +34,16 @@ function createStorage() {
   })
 
   const driver = {
-    copyObject: mock(async (params: unknown) => ({ copied: params })),
-    deleteObject: mock(async (params: unknown) => ({ deleted: params })),
-    headObject: mock(async (params: unknown): Promise<Record<string, unknown>> => ({ head: params })),
-    getObject: mock(async (_params: unknown) => ({
+    copyObject: vi.fn(async (params: unknown) => ({ copied: params })),
+    deleteObject: vi.fn(async (params: unknown) => ({ deleted: params })),
+    headObject: vi.fn(async (params: unknown): Promise<Record<string, unknown>> => ({ head: params })),
+    getObject: vi.fn(async (_params: unknown) => ({
       Body: {
         transformToByteArray: async () => new Uint8Array(Buffer.from('hello')),
       },
     })),
-    putObject: mock(async (params: unknown) => ({ put: params })),
-    listObjectsV2: mock(async () => ({
+    putObject: vi.fn(async (params: unknown) => ({ put: params })),
+    listObjectsV2: vi.fn(async () => ({
       NextContinuationToken: undefined as string | undefined,
       Contents: [] as Array<{ Key: string }>,
     })),
@@ -64,7 +56,7 @@ function createStorage() {
 
 describe('AwsS3Storage', () => {
   beforeEach(() => {
-    mock.restore()
+    vi.restoreAllMocks()
   })
 
   it('retourne le driver', () => {

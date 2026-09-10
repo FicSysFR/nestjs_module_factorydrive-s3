@@ -5,13 +5,16 @@
 !src/**
 !tests/
 !tests/**
+!scripts/
+!scripts/**
+!changelog/
+!changelog/**
 
 !.gitignore
 !.gitattributes
 !.npmrc
-!.prettierrc
-!.prettierignore
-!.eslintrc.js
+!biome.json
+!vitest.config.mts
 !.editorconfig
 !.tsconfig.json
 !.tsconfig.build.json
@@ -21,4 +24,4 @@
 !CHANGELOG.md
 !SECURITY.md
 !LICENSE
-!bun.lock*
+!yarn.lock
