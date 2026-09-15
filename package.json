@@ -84,7 +84,7 @@
     "@aws-sdk/s3-request-presigner": "^3.1004.0"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.5.12",
+    "@biomejs/biome": "2.5.13",
     "@nestjs/common": "^11.1.16",
     "@nestjs/core": "^11.1.16",
     "@ficsysfr/nestjs_module_factorydrive": "^2.0.0",
