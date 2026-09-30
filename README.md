@@ -26,7 +26,7 @@ S3 storage driver for [`@ficsysfr/nestjs_module_factorydrive`](https://www.npmjs
 ## Features
 - Amazon S3-compatible implementation of `AbstractStorage`
 - Common file operations (`put`, `get`, `copy`, `move`, `delete`, `exists`)
-- Stream and buffer support for downloads/uploads
+- Stream and buffer support for downloads/uploads, including upload streams of unknown length (multipart via `@aws-sdk/lib-storage`)
 - Signed URL generation via AWS SDK v3
 - Flat listing with automatic pagination (`listObjectsV2`)
 - Domain exceptions mapping from S3 errors
@@ -113,12 +113,12 @@ const storage = new AwsS3Storage({
 })
 ```
 
-These checksum options are optional and should not be set for real AWS S3 unless you have a specific need.
+These checksum options are optional and should not be set for real AWS S3 unless you have a specific need. They also apply to multipart stream uploads: with `WHEN_REQUIRED`, no `ChecksumAlgorithm` is requested when the multipart upload is created.
 
 ## Available methods
 
 ### Write / update
-- `put(location, content)`: upload string, `Buffer`, or readable stream
+- `put(location, content)`: upload string, `Buffer`, or readable stream (see [Streaming uploads](#streaming-uploads))
 - `copy(src, dest)`: copy object within the bucket
 - `move(src, dest)`: copy then delete source
 - `delete(location)`: delete object (`wasDeleted` is `null`, raw response is exposed)
@@ -132,13 +132,23 @@ These checksum options are optional and should not be set for real AWS S3 unless
 - `flatList(prefix?)`: async iterator over all object keys (paginated)
 - `getSignedUrl(location, options?)`: temporary signed GET URL (default `expiresIn = 900` seconds)
 
+## Streaming uploads
+`put()` picks the upload strategy from the content type:
+
+- **string / `Buffer`**: a single `PutObject` request.
+- **readable stream**: `Upload` from `@aws-sdk/lib-storage`, so the stream length does not need to be known (HTTP request bodies, GraphQL uploads, generated archives…). Streams of at most 5 MiB are buffered and sent as one `PutObject`. Larger streams become a multipart upload with 5 MiB parts and up to 4 parts in flight, so expect about 20 MiB of memory per concurrent upload. Unknown-length streams are limited to 10,000 parts (about 48.8 GiB).
+
+If the source stream errors or S3 rejects a request, `put()` rejects with a Factory Drive exception (see [Error handling](#error-handling)) and the pending multipart upload is aborted. Grant `s3:AbortMultipartUpload` in addition to `s3:PutObject`. Also add a bucket lifecycle rule for `AbortIncompleteMultipartUpload`, which cleans up parts left behind if the process dies mid-upload.
+
+The `raw` response is the `CompleteMultipartUpload` output (multipart) or the `PutObject` output with `Bucket`, `Key` and `Location` added (small streams).
+
 ## Error handling
 Known S3 errors are converted into Factory Drive exceptions:
 
 - `NoSuchBucket` -> `NoSuchBucketException`
 - `NoSuchKey` -> `FileNotFoundException`
 - `AllAccessDisabled` -> `PermissionMissingException`
-- any other error -> `UnknownException`
+- any other error -> `UnknownException`, including a source stream failing during `put()` (the original error is kept in `raw`)
 
 This keeps error handling consistent with the rest of the Factory Drive ecosystem.
 

@@ -1,7 +1,9 @@
 // Copyright 2026 FicSys
 // SPDX-License-Identifier: Apache-2.0
 
+import { Readable } from 'node:stream'
 import { GetObjectCommand, S3, type S3ClientConfig } from '@aws-sdk/client-s3'
+import { Upload } from '@aws-sdk/lib-storage'
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
 import {
   AbstractStorage,
@@ -10,6 +12,7 @@ import {
   type ExistsResponse,
   type FileListResponse,
   FileNotFoundException,
+  isReadableStream,
   NoSuchBucketException,
   PermissionMissingException,
   type Response,
@@ -47,6 +50,11 @@ function isNotFound(err: unknown): boolean {
     statusCode?: number
   }
   return e.name === 'NotFound' || e.name === 'NoSuchKey' || e.Code === 'NotFound' || e.Code === 'NoSuchKey' || e.$metadata?.httpStatusCode === 404 || e.statusCode === 404
+}
+
+/** lib-storage only accepts core `stream.Readable`; wrap userland streams (e.g. `readable-stream`). */
+function toReadable(stream: NodeJS.ReadableStream): Readable {
+  return stream instanceof Readable ? stream : new Readable().wrap(stream)
 }
 
 // noinspection JSUnusedGlobalSymbols
@@ -167,9 +175,24 @@ export class AwsS3Storage extends AbstractStorage {
 
   public async put(location: string, content: Buffer | NodeJS.ReadableStream | string): Promise<Response> {
     try {
+      if (isReadableStream(content)) {
+        // PutObject needs a known length; Upload buffers parts, so streams of unknown length work.
+        // done() must follow the constructor without an await in between, so the stream's error
+        // listener is attached before it can emit.
+        const upload = new Upload({
+          client: this.$driver,
+          params: {
+            Key: location,
+            Body: toReadable(content),
+            Bucket: this.$bucket,
+          },
+        })
+        return { raw: await upload.done() }
+      }
+
       const result = await this.$driver.putObject({
         Key: location,
-        Body: content as Buffer,
+        Body: content,
         Bucket: this.$bucket,
       })
       return { raw: result }
