@@ -1,6 +1,9 @@
 <p align="center">
-  <a href="http://nestjs.com/" target="blank">
-    <img src="https://nestjs.com/img/logo_text.svg" width="320" alt="Nest Logo" />
+  <a href="https://ficsysfr.github.io/nestjs_module_factorydrive/" target="blank">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/FicSysFR/nestjs_module_factorydrive/main/docs/public/logo/logo-full-dark.svg" />
+      <img src="https://raw.githubusercontent.com/FicSysFR/nestjs_module_factorydrive/main/docs/public/logo/logo-full.svg" width="320" alt="Factory Drive logo" />
+    </picture>
   </a>
 </p>
 
@@ -175,4 +178,7 @@ CI runs tests (with coverage upload) and build on pushes/PRs.
 Please read [`SECURITY.md`](./SECURITY.md) before reporting vulnerabilities.
 
 ## License
-MIT, see [`LICENSE`](./LICENSE).
+Apache-2.0, see [`LICENSE`](./LICENSE). Copyright 2026 FicSys.
+
+Versions up to and including 2.0.0 were published under the MIT License and remain
+available under those terms.
