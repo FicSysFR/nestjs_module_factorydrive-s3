@@ -1,0 +1,19 @@
+---
+description: Livraisons et publications sans attribution d'IA
+alwaysApply: true
+---
+
+# Attribution des livraisons
+
+<!-- ai-attribution-policy -->
+
+- Aucun commit, pull request, issue, ticket ou commentaire ne crédite une IA.
+- Ne jamais ajouter d'auteur ou co-auteur IA, de trailer `Co-Authored-By`, de
+  signature `Generated with`/`Made-with`, ni de mention équivalente.
+- Retirer ces lignes même lorsqu'elles sont préremplies par Cursor, Grok,
+  Claude, ChatGPT/Codex, Copilot ou un autre outil.
+- Vérifier le texte final juste avant chaque commit ou publication.
+
+Les agents cloud Cursor imposent actuellement leur propre attribution aux
+commits. Ne pas utiliser ce mode pour committer ou ouvrir une pull request dans
+ce dépôt ; restituer les changements sans publication.

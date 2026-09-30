@@ -9,6 +9,8 @@
 !scripts/**
 !changelog/
 !changelog/**
+!.cursor/
+!.cursor/**
 
 !.gitignore
 !.gitattributes
@@ -26,3 +28,17 @@
 !SECURITY.md
 !LICENSE
 !yarn.lock
+
+# Fysion — points d'entrée génériques versionnés (jamais .fysion/, .agents/skills/,
+# .claude/skills/ ou CLAUDE.local.md : voir AGENTS.md > Confidentialité)
+!AGENTS.md
+!project-context.md
+!commit-convention.md
+!.cursorrules
+!.agents/
+!.agents/language.json
+!.agents/tracker.json
+!.claude/
+!.claude/settings.json
+!.vscode/
+!.vscode/settings.json

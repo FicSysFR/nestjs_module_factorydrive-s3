@@ -1,0 +1,46 @@
+# Messages de commit (bouton « Generate Commit Message » de Cursor)
+
+Ce fichier n'est lu que par le générateur de message de commit de Cursor, pas
+par le chat ni l'agent. Convention complète et source de vérité du dépôt :
+`commit-convention.md`.
+
+## Format
+
+<!-- ai-attribution-policy -->
+
+`type(scope): description`
+
+- Langue : anglais, sujet et corps.
+- Sujet : impératif, minuscule après `:`, sans point final, ≤ 72 caractères.
+- Types : `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `build`,
+  `ci`, `chore`, `revert`.
+- Un seul scope, tiré de l'énumération ci-dessous. L'omettre plutôt qu'en
+  inventer un.
+- Auteurs humains uniquement : jamais de trailer `Co-Authored-By` pour une IA,
+  ni de signature `Generated with` ou `Made-with`.
+
+## Scopes du dépôt
+
+Aucun `scope-enum` outillé (pas de commitlint) ; scopes observés dans
+l'historique du dépôt, à réutiliser plutôt qu'à inventer :
+
+| Fichiers touchés | Scope |
+| --- | --- |
+| `src/**`, `tests/**` | `s3` |
+| `.github/workflows/**` | `ci` |
+| `package.json` (dépendances de production) | `deps` |
+| `package.json` (dépendances de développement) | `deps-dev` |
+| `package.json` (version), `changelog/**`, `CHANGELOG.md` | `release` |
+
+## Ruptures
+
+`feat(scope)!: description`, ou pied de page `BREAKING CHANGE: description`.
+
+## Anti-exemples
+
+```
+Add feature             → type absent
+feat(unknown): add x    → scope hors énumération
+feat(api): add thing.   → point final interdit
+Co-Authored-By: Claude  → IA en co-auteur
+```
